@@ -1,0 +1,35 @@
+@startuml kata
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Container.puml
+
+Person(org, "Organiser")
+Person(speaker, "Speaker")
+Person(attendee, "Attendee")
+
+System_Ext(idam, "AWS Cognito")
+
+Container_Boundary(content, "content"){
+  Container(cms, "CMS", "External SaaS", "Publishes S3-based sites and manages site content")
+  Container(cfp, "CFP Site", "AWS CloudFront & S3", "Portal for CFP submissions")
+  Container(conf, "Conf Site", "AWS CloudFront & S3", "Responsive Web App for Conference")
+  Container(notify, "Notifier", "AWS Lambda", "Notifies customers of schedule change")
+  
+}
+Rel_L(cms, cfp, "Publishes", "S3 API")
+Rel_R(cms, conf, "Publishes", "S3 API")
+Rel(cms, idam, "Create customer directory", "Cognito API")
+
+Rel_R(conf, notify, "S3 Object Created event", "S3 API")
+Rel(notify, attendee, "SMS notifications", "AWS SNS API")
+Rel(notify, idam, "Cognito ListUsers", "Cognito API")
+
+Rel_U(org, cms, "Creates sites and manages content", "HTTPS")
+Rel_U(org, cms, "Publish speaker slides", "HTTPS")
+Rel_L(speaker, cfp, "Register/Login", "HTTPS")
+Rel_D(attendee, conf, "Register/Login", "HTTPS")
+Rel_D(attendee, conf, "Update notification status", "HTTPS")
+Rel_D(attendee, conf, "View content", "HTTPS")
+
+Rel_U(cfp, idam, "Authenticates", "Oauth")
+Rel(conf, idam, "Authenticates", "Oauth")
+
+@enduml

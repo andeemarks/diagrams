@@ -1,0 +1,100 @@
+@startuml kata
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Container.puml
+
+' System_Boundary(god, "God Service"){
+
+'   System(a, "Service", "")
+'   System(b, "Service", "")
+'   System(c, "Service", "")
+'   System(d, "Service", "")
+'   System(e, "Service", "")
+'   System(f, "Service", "")
+'   System(g, "Service", "")
+'   System(h, "Service", "")
+
+'   Rel(a, b, " ")
+'   Rel(a, c, " ")
+'   Rel(a, d, " ")
+'   Rel(a, e, " ")
+'   Rel(a, f, " ")
+'   Rel(a, g, " ")
+'   Rel(a, h, " ")
+' }
+
+
+' System_Boundary(spof, "Single Point of Failure"){
+
+'   System(i, "Service", "")
+'   System(j, "Service", "")
+'   System(k, "Service", "")
+'   System(l, "Service", "")
+'   System(m, "Service", "")
+'   System(n, "Service", "")
+'   System(o, "Service", "")
+'   System(p, "Service", "")
+
+'   Rel(j, i, " ")
+'   Rel(k, i, " ")
+'   Rel(l, i, " ")
+'   Rel(m, i, " ")
+'   Rel(n, i, " ")
+'   Rel(o, i, " ")
+'   Rel(p, i, " ")
+' }
+
+' System_Boundary(external, "Multiple Integrations to External Service"){
+'   System(q, "Service", "")
+'   System(r, "Service", "")
+'   System_Ext(s, "Service", "")
+
+'   Rel(q, s, " ")
+'   Rel(r, s, " ")
+
+' }
+
+' System_Boundary(trafalgar, "Battle of Trafalgar"){
+'   System(t, "Service", "")
+'   System(u, "Service", "")
+
+'   Rel_R(t, u, " ")
+'   Rel_R(t, u, " ")
+'   Rel_R(t, u, " ")
+'   Rel_L(u, t, " ")
+'   Rel_R(t, u, " ")
+'   Rel_L(u, t, " ")
+
+' }
+
+
+' System_Boundary(layercake, "Enterprise Abstraction Layer Cake"){
+'   System(v, "Service", "")
+'   System(w, "Service", "")
+'   System(x, "Service", "")
+'   System(y, "Service", "")
+'   ContainerDb(db, "DB", "Postgres")
+'   Rel_D(v, w, " ")
+'   Rel_D(w, x, " ")
+'   Rel_D(x, y, " ")
+'   Rel_D(y, db, " ")
+
+' }
+
+' System_Boundary(shareddb, "Shared DB"){
+'   System(a2, "Service", "")
+'   System(b2, "Service", "")
+'   ContainerDb(db2, "DB", "Postgres")
+'   Rel(a2, db2, " ")
+'   Rel(b2, db2, " ")
+
+' }
+
+System_Boundary(cyclicdep, "Cyclic Dependency"){
+  System(c2, "Service", "")
+  System(d2, "Service", "")
+  Rel_R(c2, d2, " ")
+  Rel_L(d2, c2, " ")
+
+}
+
+
+@enduml

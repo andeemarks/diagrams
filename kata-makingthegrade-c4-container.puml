@@ -1,0 +1,59 @@
+@startuml kata
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Container.puml
+
+Person(student, "Student")
+Person(admin, "Administrator")
+Person(grader, "Grader")
+Person(reportViewer, "Report Viewer")
+
+System(events, "Pub Sub infra", "Rabbit MQ Broker on RHEL")
+
+System_Boundary(testing, "Testing"){
+
+  Container(testBE, "Test Controller", "React, Spring Boot on Tomcat")
+  ContainerDb(testDB, "Test Responses", "Postgres")
+  ContainerDb(testConfigDB, "Test Configuration", "Postgres")
+  Container(testAdminBE, "Test Admin", "React, Spring Boot on Tomcat")
+
+  Rel_R(testBE, testAdminBE, "Auth", "HTTPS")
+  Rel_D(testBE, testDB, "Retrieve questions, store responses", "JDBC")
+  Rel_D(testAdminBE, testConfigDB, "Maintains config", "JDBC")
+
+  Rel(admin, testAdminBE, "Uses", "HTTPS")
+  Rel_L(testBE, testAdminBE, "Query test status", "JSON/HTTPS")
+  Rel_L(testAdminBE, testBE, "Finalise test responses", "HTTPS")
+  Rel(testAdminBE, events, "Pub(TestCompleted)", "AMQP")
+  Rel(testBE, events, "Publ(ResponseAdded)", "AMQP")
+
+  Rel(student, testBE, "Uses", "HTTPS")
+}
+
+System_Boundary(grading, "Grading"){
+  Container(gradingBE, "Grading Engine", "React, Spring Boot on Tomcat")
+  ContainerDb(responsesDb, "Responses", "Postgres")
+  ContainerDb(answersDb, "Answers", "Postgres")
+  Rel(gradingBE, answersDb, "Retrieve correct answers", "JDBC")
+  Rel(grader, gradingBE, "Uses", "HTTPS")
+  Rel(gradingBE, responsesDb, "Retrieve responses, record grades", "JDBC")
+  Rel(gradingBE, gradingBE, "Auto grade responses")
+  Rel_U(gradingBE, events, "Sub(TestCompleted, ResponseAdded), Pub(GradingCompleted, ResponseGraded)", "AMQP")
+}
+
+System_Boundary(reporting, "Reporting"){
+  Container(reportBE, "Report Generator", "React, Spring Boot on Tomcat")
+  ContainerDb(reportAuditDb, "Audit Log", "Postgres")
+  ContainerDb(gradesDB, "Test Grades", "Postgres")
+
+  Rel(reportViewer, reportBE, "Uses", "HTTPS")
+  Rel_R(reportBE, reportAuditDb, "Log request", "JDBC")
+  Rel(reportBE, gradesDB, "Retrieve grades", "JDBC")
+  Rel(reportBE, events, "Sub(GradingCompleted, ResponseGraded)", "AMQP")
+}
+
+System_Boundary(idam, "IDAM (Used for all Auth requests)") {
+  ContainerDb(students, "Student Directory", "LDAP")
+  ContainerDb(staff, "Staff Directory", "LDAP")
+
+}
+
+@enduml

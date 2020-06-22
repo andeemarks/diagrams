@@ -1,0 +1,21 @@
+@startuml kata
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Container.puml
+
+Person(org, "Organiser")
+Person(speaker, "Speaker")
+
+System_Ext(idam, "AWS Cognito")
+
+Container(cms, "CMS", "External SaaS", "Publishes S3-based sites and manages site content")
+Container(cfp, "CFP Site", "AWS CloudFront & S3", "Portal for CFP submissions")
+
+Rel_L(cms, cfp, "Publishes", "S3 API")
+Rel(cms, idam, "Create customer directory", "Cognito API")
+
+Rel_U(org, cms, "Creates sites and manages content", "HTTPS")
+Rel_U(speaker, cfp, "Register/Login", "HTTPS")
+Rel_U(speaker, cfp, "Submits talk", "HTTPS")
+
+Rel_U(cfp, idam, "Authenticates", "Oauth")
+
+@enduml
