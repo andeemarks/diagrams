@@ -1,0 +1,16 @@
+@startuml kata-allstuffnocruft-c4-context
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Context.puml
+
+Person(organiser, "Organiser", "")
+Person(attendee, "Attendee", "")
+Person(speaker, "Speaker", "")
+
+System(system, "Conference Organising System", "Hosts content and gathers feedback")
+
+Rel(organiser, system, "Creates sites and manages content")
+Rel(attendee, system, "Views schedule, votes on talks, downloads slides")
+Rel(speaker, system, "Submits talks and views feedback")
+Rel(system, attendee, "Notifies of schedule updates")
+Rel(organiser, speaker, "Negotiates speaker slot")
+
+@enduml

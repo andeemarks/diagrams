@@ -1,0 +1,18 @@
+@startuml kata-makinghegrade-c4-context
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Context.puml
+
+LAYOUT_LEFT_RIGHT
+
+Person(student, "Student")
+Person(grader, "Grader")
+Person(administrator, "Administrator")
+Person(reportViewer, "Report Viewer")
+
+System(system, "Testing System", "Hosts and grades tests, and generates reports")
+
+Rel(administrator, system, "Manages access to tests")
+Rel(reportViewer, system, "Requests and reads reports")
+Rel(grader, system, "Grades tests")
+Rel(student, system, "Sits tests")
+
+@enduml

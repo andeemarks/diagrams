@@ -1,0 +1,23 @@
+@startuml C4_Elements
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Context.puml
+
+title Kata - I'll Have The BLT
+
+LAYOUT_TOP_DOWN
+
+Person(customerAlias, "Customer", "")
+
+Person(marketingAlias, "Marketing", "")
+System(systemAlias, "System", "")
+
+Person(driverAlias, "Driver", "")
+
+System_Ext(gatewayAlias, "Payment Gateway", "External SaaS")
+
+Rel(customerAlias, systemAlias, "Orders via")
+Rel(marketingAlias, systemAlias, "Maintains promotions in")
+Rel(customerAlias, gatewayAlias, "Online payment via")
+Rel(systemAlias, gatewayAlias, "Redirects customer for payment")
+Rel(driverAlias, customerAlias, "Delivers order to")
+
+@enduml

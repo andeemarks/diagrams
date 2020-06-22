@@ -1,0 +1,33 @@
+@startuml C4_Elements
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Context.puml
+
+title Kata - I'll Have The BLT
+
+LAYOUT_TOP_DOWN
+
+Person(customerAlias, "Customer", "")
+
+Enterprise_Boundary(c0, "Parent Company") {
+    Person(marketingAlias, "Marketing", "")
+    System(systemAlias, "System", "")
+
+    Boundary(c1, "Store") {
+        Person(cashierAlias, "Cashier", "in store")
+        Person(driverAlias, "Driver", "")
+        Person(makerAlias, "Sandwich Maker", "in store")
+        System(printerAlias, "Docket Printer", "in-store hardware")
+    }
+}
+
+System_Ext(gatewayAlias, "Payment Gateway", "External SaaS")
+
+Rel(customerAlias, systemAlias, "Orders via")
+Rel(systemAlias, printerAlias, "Prints orders via")
+Rel(marketingAlias, systemAlias, "Maintains promotions in")
+Rel(customerAlias, gatewayAlias, "Online payment via")
+Rel(systemAlias, gatewayAlias, "Redirects customer for payment")
+Rel(cashierAlias, printerAlias, "Retrieves dockets from")
+Rel(driverAlias, customerAlias, "Delivery order to")
+Rel(cashierAlias, driverAlias, "Dispatches order via")
+
+@enduml

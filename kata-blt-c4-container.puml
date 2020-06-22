@@ -1,0 +1,66 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Container.puml
+
+title Kata - I'll Have The BLT
+
+Person(customer, "Customer", "")
+Person(marketing, "Marketing", "")
+
+System_Ext(gateway, "Payment Gateway", "External SaaS")
+Rel(customer, gateway, "Online payment", "HTTPS")
+
+System_Boundary(c0, "System") {
+    System_Boundary(c2, "Promotions") {
+        Container(promotions_cms, "Promotions CMS", "Headless CMS", "CRUD for Promotions e.g., dotCMS")
+        Container(promotions_be, "Promotions Publication API", "Node JS/Lambda behind API Gateway", "Manages live promotions")
+        Rel_Back_Neighbor(promotions_be, promotions_cms, "Notify published promotions", "JSON/HTTPS")
+        Rel_Back_Neighbor(promotions_be, promotions_cms, "Notify expired promotions", "JSON/HTTPS")
+    }
+
+    System_Boundary(c1, "Order Management") {
+
+        System_Boundary(c4, "In store") {
+            Person(cashier, "Cashier", "")
+            Container(store_fe, "Store F/E", "React", "Static content (HTML, CSS, images, JS)")
+            Container(docket_fe, "Docket Printer F/E", "React", "Polls B/E for new confirmed orders")
+            System(printer, "Docket Printer", "In-store hardware")
+            Rel(docket_fe, printer, "Print Order docket")
+        }
+
+        Container(store_be, "Store B/E", "Node JS/Lambda behind API Gateway", "Business logic for order placement and confirmation")
+        ContainerDb(store_db, "Store DB", "S3 Bucket", "Append-only log of orders")
+        Rel(store_fe, store_be, "Uses", "JSON/HTTPS")
+        Rel_Neighbor(store_be, store_db, "Persists orders", "aws-sdk")
+        Rel_Back_Neighbor(store_be, store_db, "Queries orders", "aws-sdk")
+        Rel_Neighbor(docket_fe, store_be, "Queries for new orders", "JSON/HTTPS")
+    }
+
+    System_Boundary(c3, "Ordering") {
+        Container(customer_fe, "Customer F/E", "React SPA", "Static content (HTML, CSS, images, JS)")
+        Container(customer_be, "Customer B/E", "Node JS/Lambda behind API Gateway", "Order confirmation and payment status updates")
+        Rel(customer_fe, customer_be, "Uses", "JSON/HTTP")
+        Rel(customer_fe, customer_be, "Retrieve promotions", "JSON/HTTP")
+    }
+
+    System_Boundary(c5, "Alerting") {
+        System(cloudwatch, "AWS CloudWatch")
+        System(sns, "AWS Simple Notification Service")
+        Rel(cloudwatch, sns, "Alerts for human intervention")
+    }
+}
+
+Rel(cashier, printer, "Retrieves printed docket", "Manual")
+Rel(marketing, promotions_cms, "Maintains promotions", "HTTPS")
+Rel(customer, customer_fe, "Places order", "HTTPS")
+Rel(cashier, store_fe, "Manages orders", "HTTPS")
+Rel(customer_fe, gateway, "Redirects for payment", "HTTPS")
+Rel_Neighbor(gateway, customer_be, "Confirms payment status", "HTTPS")
+Rel(customer_be, store_be, "Order placement", "JSON/HTTPS")
+Rel(promotions_be, customer_be, "Publishes promotions", "JSON/HTTPS")
+Rel(customer_fe, cloudwatch, "Customer B/E failures")
+Rel(customer_be, cloudwatch, "Payment Gateway failures")
+Rel(customer_be, cloudwatch, "Store B/E failures")
+Rel(store_be, cloudwatch, "Store DB failures")
+Rel(docket_fe, cloudwatch, "Store B/E failures")
+Rel(sns, cashier, "SMS")
+@enduml
