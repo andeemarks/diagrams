@@ -1,0 +1,39 @@
+title All Stuff, No Cruft - CFP
+
+actor Speaker
+actor Organiser
+Organiser->System: Open CFP
+Speaker->System: Visits CFP page
+
+opt new-speaker
+    Speaker->System: Registers profile
+    System-->System: Creates account
+end
+
+Speaker->System: Logs in
+Speaker->System: Creates submission(s)
+Speaker->System: Updates submission(s)
+Organiser->System: Closes CFP
+Organiser->System: Assesses submissions
+
+loop 
+
+    note over Speaker, Organiser: email
+    Organiser->Speaker: Offers slot to successful speaker
+    alt
+        Speaker->Organiser: Accepts offer
+    else
+        Speaker->Organiser: Rejects offer
+    end
+    
+    Organiser->System: Update speaker status
+    
+    Organiser->Speaker: Notifies unsuccessful speaker
+end
+
+opt 
+    Speaker->System: Update bio details
+    Speaker->System: Upload bio photo
+end
+
+Organiser->System: Announce speakers

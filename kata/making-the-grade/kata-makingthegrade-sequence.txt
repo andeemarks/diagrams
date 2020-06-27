@@ -1,0 +1,56 @@
+title Making The Grade
+
+actor Student
+actor Grader
+actor Administrator
+actor Report Viewer
+
+Administrator->System: enables access to test
+
+Student->System: Logs in
+alt
+    System->Student: Presents test
+else
+    System->Student: Show access error
+    System->Administrator: Show access error
+end
+
+loop answers
+    Student->System: enters response
+    opt
+        Student->System: updates response
+    end
+end
+
+Student->System: Completes test
+
+Administrator->System: disables access to test
+
+System->System: grades multiple choice questions
+
+Grader->System: Logs in
+
+note over Grader,System: workflow
+loop
+    Grader->System: View queue of question response sets
+    Grader->System: Assigns self to response set
+    loop
+        Grader->System: Views question response
+        Grader->System: Enters grade
+        Grader->System: Enters notes
+    end
+    Grader->System: Views response set grades
+    Grader->System: Submits response set
+    System->System: Updates grades
+    
+    opt test-completed
+        System->System: Marks test as completed
+    end
+end
+
+Report Viewer->System: Logs in 
+Report Viewer->System: Request report
+System->System: Generate report
+Report Viewer->System: Download report
+System->System: Audit report generation
+

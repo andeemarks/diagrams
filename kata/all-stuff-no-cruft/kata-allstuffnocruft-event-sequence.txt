@@ -1,0 +1,51 @@
+title All Stuff, No Cruft - Event
+
+actor Speaker
+actor Organiser
+actor Attendee
+
+Organiser->System: Allocate talks to rooms
+Organiser->System: Publish schedule
+
+opt new-attendee
+    Speaker->System: Registers profile
+    System-->System: Creates account
+end
+
+Attendee->System: View schedule
+
+opt notification-opt-in
+    Attendee->System: Opts in
+    System->System: Updates notification status
+    System-->Attendee: Sends confirmation notification
+end
+
+opt notification-opt-out
+    Attendee->System: Opts out
+    System->System: Updates notification status
+    System-->Attendee: Sends confirmation notification
+end
+
+opt room-update
+    Organiser->System: Allocate talks to rooms
+    Organiser->System: Publish schedule
+    System->Attendee: Send room update notification
+end
+
+opt evaluation
+    note over Attendee,System: web page, email, SMS, or phone
+    Attendee->System: Vote on talk
+    System->System: Persist vote
+end
+
+Speaker->System: Publish slides
+
+opt view-slides
+    Attendee->System: Download speaker slides
+    Attendee->Attendee: View slides
+end
+
+opt view-evaluation
+    Speaker->System: View evaluation
+    Organiser->System: View all evaluations
+end
