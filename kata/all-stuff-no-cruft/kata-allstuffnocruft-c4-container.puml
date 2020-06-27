@@ -1,0 +1,45 @@
+@startuml kata
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/release/1-0/C4_Container.puml
+
+System_Ext(cfp, "Sessonize.com")
+Person(org, "Organiser")
+Person(speaker, "Speaker")
+Person(attendee, "Attendee")
+
+System_Boundary(system, "Conference Organising System") {
+
+    System(idam, "AWS Cognito")
+
+    Container(cms, "Conference Site Generator", "React on AWS Amplify Console", "Builds branded conf sites for Organiser")
+    Container(conf, "Conf CMS", "React on AWS Amplify Console", "Responsive Web App for Conference speakers and attendees")
+    Rel_R(cms, conf, "Publishes from template", "AWS API")
+    Rel(conf, cfp, "Embed schedule snippet", "JSON/HTTP")
+
+    Container(feedback, "UGC", "AWS API Gateway & Lambda", "Back-end API for UGC data")
+    ContainerDb(feedbackDb, "UGC", "AWS S3")
+
+    Rel(conf, idam, "Authenticates", "Oauth")
+    Rel(conf, idam, "Update attendee details", "Cognito API")
+    Rel(conf, feedback, "Persists feedback", "JSON/HTTPS")
+    Rel(feedback, feedbackDb, "Persists feedback", "S3 API")
+
+    Container(notify, "Notifier", "AWS CloudWatch & Lambda", "Scheduled job to notify customers of schedule change")
+    ContainerDb(schedule, "Schedule", "AWS S3")
+    Rel_D(notify, schedule, "Persists current schedule", "S3 API")
+
+    Rel(org, cfp, "Uses", "HTTPS")
+    Rel_Neighbor(notify, cfp, "Check schedule state", "JSON/HTTP")
+    Rel(cms, idam, "Create customer directory", "Cognito API")
+
+    Rel(notify, attendee, "SMS notifications", "SNS API")
+    Rel(notify, idam, "/listUsers", "Cognito API")
+
+    Rel(org, cms, "Uses", "HTTPS")
+    Rel(speaker, cfp, "Uses", "HTTPS")
+
+    Rel(attendee, conf, "Uses", "HTTPS")
+    Rel(org, conf, "Uses", "HTTPS")
+    Rel(speaker, conf, "Uses", "HTTPS")
+}
+
+@enduml
